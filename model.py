@@ -521,9 +521,9 @@ def run_transformer_forward(src_ids, tgt_ids, model_params, num_heads, pad_id):
     causal_mask = build_causal_mask(tgt_seq)
     tgt_mask = combine_padding_and_causal_masks(tgt_padding_mask, causal_mask)
 
-    encoder_output = stack_encoder_layers(src_emb, encoder_layers, num_heads, tgt_mask)
+    encoder_output = stack_encoder_layers(src_emb, encoder_layers, num_heads, src_mask)
 
-    decoder_output = stack_decoder_layers(tgt_emb, encoder_output, decoder_layers, num_heads, src_mask, src_mask)
+    decoder_output = stack_decoder_layers(tgt_emb, encoder_output, decoder_layers, num_heads, src_mask, tgt_mask)
 
     logits = apply_final_output_projection(decoder_output, output_projection)
     log_probs = apply_log_softmax_over_vocab(logits)
