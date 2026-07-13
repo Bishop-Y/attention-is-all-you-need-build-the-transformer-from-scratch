@@ -220,7 +220,7 @@ def scaled_dot_product_attention(query, key, value, mask=None):
     attention_weights = softmax(scores, dim=-1)
     attention_weights = torch.where(torch.isnan(attention_weights), 0.0, attention_weights)
     
-    context = attention_weights @ v
+    context = attention_weights @ value
 
     return context, attention_weights
 
@@ -292,8 +292,17 @@ def merge_heads_and_project_output(context, w_o, b_o):
         res += b_o
     return res
 
-# Step 31 - assemble_multi_head_attention_forward (not yet solved)
-# TODO: implement
+# Step 31 - assemble_multi_head_attention_forward
+def assemble_multi_head_attention_forward(query, key, value, w_q, w_k, w_v, w_o, num_heads, mask=None):
+    # TODO: project Q/K/V, split into heads, run scaled dot-product attention, merge heads, output projection.
+    q = query @ w_q.T
+    k = key @ w_k.T
+    v = value @ w_v.T
+
+    q_h, k_h, v_h = split_qkv_into_heads(q, k, v, num_heads)
+    context, attention = multi_head_scaled_dot_product_attention(q_h, k_h, v_h, mask)
+
+    return merge_heads_and_project_output(context, w_o, None)
 
 # Step 32 - apply_ffn_first_linear_and_relu (not yet solved)
 # TODO: implement
